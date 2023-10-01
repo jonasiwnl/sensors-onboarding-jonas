@@ -35,6 +35,7 @@ from bno055.connectors.uart import UART
 from bno055.error_handling.exceptions import BusOverRunException
 from bno055.params.NodeParameters import NodeParameters
 from bno055.sensor.SensorService import SensorService
+from bno055.logger.LoggerService import LoggerService
 import rclpy
 from rclpy.node import Node
 
@@ -49,6 +50,7 @@ class Bno055Node(Node):
     """
 
     sensor = None
+    logger = None
     param = None
 
     def __init__(self):
@@ -78,6 +80,9 @@ class Bno055Node(Node):
 
         # Instantiate the sensor Service API:
         self.sensor = SensorService(self, connector, self.param)
+
+        # Instantiate logging API:
+        self.logger = LoggerService(self)
 
         # configure imu
         self.sensor.configure()
