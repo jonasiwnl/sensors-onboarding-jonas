@@ -25,7 +25,7 @@ class LoggerService:
 
     def logging_callback(self, msg):
         time = self.node.get_clock().now()
-        self.node.get_logger().info('INFO @ %s' % time)
+        # self.node.get_logger().info('INFO @ %s' % time)
 
         # Task 1: Log velocity and orientation
         self.node.get_logger().info('Orientation (%.2f, %.2f, %.2f, %.2f)'
