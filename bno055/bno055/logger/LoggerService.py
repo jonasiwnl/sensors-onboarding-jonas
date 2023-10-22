@@ -10,7 +10,7 @@ class LoggerService:
     def __init__(self, node: Node):
         self.node = node
 
-        self.logging_subscription = self.create_subscription(
+        self.logging_subscription = self.node.create_subscription(
             Imu,
             '/bno055/imu',
             self.logging_callback,
@@ -24,7 +24,7 @@ class LoggerService:
         self.last_time = node.get_clock().now()
 
     def logging_callback(self, msg):
-        time = self.get_clock().now()
+        time = self.node.get_clock().now()
         self.node.get_logger().info('INFO @ %s' % time)
 
         # Task 1: Log velocity and orientation
@@ -42,15 +42,17 @@ class LoggerService:
             self.node.get_logger().warn('IMU flipped over.')
             self.z_orientation = not self.z_orientation
 
+        """
         # Task 3: Log sudden acceleration changes
-        time = self.node.get_clock().now()
         if self.last_acceleration:
             distance = sqrt(
                 pow(msg.linear_acceleration.x - self.last_acceleration.x, 2) +
                 pow(msg.linear_acceleration.y - self.last_acceleration.y, 2) +
                 pow(msg.linear_acceleration.z - self.last_acceleration.z, 2) )
 
+            # TODO ?
             if distance / (time - self.last_time) > self.ACCELERATION_THRESHOLD:
                 self.node.get_logger().warn('Sudden acceleration change.')
         self.last_acceleration = msg.linear_acceleration
         self.last_time = time
+        """
