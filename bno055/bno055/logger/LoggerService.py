@@ -4,6 +4,13 @@ from rclpy.node import Node
 from sensor_msgs.msg import Imu
 
 
+class P3:
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self.z = 0
+
+
 class LoggerService:
     ACCELERATION_THRESHOLD = 10.0
 
@@ -17,7 +24,9 @@ class LoggerService:
         10)
 
         # Assume IMU is initialized not moving
+        self.velocity = P3()
         self.velocity.x = self.velocity.y = self.velocity.z = 0
+        self.acceleration = P3()
         self.acceleration.x = self.acceleration.y = self.acceleration.z = 0
         self.time = node.get_clock().now().nanoseconds * 1e-9
         self.z_orientation = False # Assume IMU is initialized facing up
@@ -25,10 +34,10 @@ class LoggerService:
     def logging_callback(self, msg):
         # Task 1: Log linear velocity and orientation
         new_time = self.node.get_clock().now().nanoseconds * 1e-9
-        delta = self.time - new_time
-        self.velocity.x += msg.linear_acceleration.x * delta
-        self.velocity.y += msg.linear_acceleration.y * delta
-        self.velocity.z += msg.linear_acceleration.z * delta
+        time_delta = self.time - new_time
+        self.velocity.x += msg.linear_acceleration.x * time_delta
+        self.velocity.y += msg.linear_acceleration.y * time_delta
+        self.velocity.z += msg.linear_acceleration.z * time_delta
 
         self.node.get_logger().info('Orientation (%.2f, %.2f, %.2f, %.2f)'
                                % (msg.orientation.x, msg.orientation.y,
@@ -52,7 +61,7 @@ class LoggerService:
             pow(msg.linear_acceleration.z - self.acceleration.z, 2) )
 
         # TODO ?
-        if accel_delta / delta > self.ACCELERATION_THRESHOLD:
+        if accel_delta / time_delta > self.ACCELERATION_THRESHOLD:
             self.node.get_logger().warn('Sudden acceleration change.')
 
         self.acceleration = msg.linear_acceleration
